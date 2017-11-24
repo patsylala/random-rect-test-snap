@@ -79,8 +79,9 @@ var rectGrid = (function() {
 
     //rect or square
     if (Math.random() > 0.8) {
-      this.maxX = this.x + (gridSize * 3);
-      this.maxY = this.y + (gridSize * 2);
+      var random = Math.floor(Math.random() * 2 ) + 1;
+      this.maxX = this.x + (gridSize * 3 * random);
+      this.maxY = this.y + (gridSize * 2 * random);
     }
     else if (Math.random() > 0.8) {
       var random = Math.floor(Math.random() * 5 ) + 1;
@@ -89,8 +90,9 @@ var rectGrid = (function() {
       this.bigSquare = true;
     }
     else if (Math.random() > 0.8) {
-      this.maxX = this.x + (gridSize * 2);
-      this.maxY = this.y + (gridSize * 4);
+      var random = Math.floor(Math.random() * 2 ) + 1;
+      this.maxX = this.x + (gridSize * 2 * random);
+      this.maxY = this.y + (gridSize * 4 * random);
       this.longRect = true;
     }
 
@@ -124,6 +126,9 @@ var rectGrid = (function() {
       if (Math.random() > 0.3) {
         if (this.isSquare) {this.rect.transform("r" + (Math.floor(Math.random()* 4) * 90).toString())}
         else {this.rect.transform('s1,' + (Math.random() < 0.5 ? -1 : 1).toString())};
+      }
+      if (Math.random() > 0.3) {
+        this.rect.attr({ fill: colors[randomNumber(colors)] });
       }
     }
 
