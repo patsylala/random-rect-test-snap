@@ -68,11 +68,12 @@ var rectGrid = (function() {
 
   function Shape() {
     this.rect;
-    this.x = Math.floor(Math.random() * (width/gridSize)) * gridSize;
-    this.y = Math.floor(Math.random() * (height/gridSize)) * gridSize;
+    this.x = (Math.floor(Math.random() * (width/gridSize)) + 1) * gridSize;
+    this.y = (Math.floor(Math.random() * (height/gridSize)) + 1) * gridSize;
 
     this.maxX = this.x + gridSize;
     this.maxY = this.y + gridSize;
+
     this.bigSquare = false;
     this.longRect = false;
     this.isSquare = false;
@@ -114,8 +115,8 @@ var rectGrid = (function() {
       this.isSquare = true;
       if (!this.bigSquare) {
         if (Math.random() > 0.2) {
-          this.x = Math.floor(Math.random() * (width/gridSize)) * (gridSize/2);
-          this.y = Math.floor(Math.random() * (height/gridSize)) * (gridSize/2);
+          this.x = (Math.floor(Math.random() * (width/(gridSize/2))) + 1) * (gridSize/2);
+          this.y = (Math.floor(Math.random() * (height/(gridSize/2))) + 1) * (gridSize/2);
           this.maxX = this.x + (gridSize/2);
           this.maxY = this.y + (gridSize/2);
         }
