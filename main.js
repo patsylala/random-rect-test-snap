@@ -6,7 +6,7 @@ var rectGrid = (function() {
   var rectMasks = ["link-2", "three-corner-2"];
   var colors = ["#7537f6","#acffca","#999999","#fff"];
   var gridSize = 50;
-  var shapeNo = 40;
+  var shapeNo = 50;
   var width = 1000;
   var height = 650;
   var shapeArray = [];
@@ -70,31 +70,33 @@ var rectGrid = (function() {
     this.rect;
     this.x = (Math.floor(Math.random() * (width/gridSize)) + 1) * gridSize;
     this.y = (Math.floor(Math.random() * (height/gridSize)) + 1) * gridSize;
-
-    this.maxX = this.x + gridSize;
-    this.maxY = this.y + gridSize;
-
+    this.maxX;
+    this.maxY;
     this.bigSquare = false;
     this.longRect = false;
     this.isSquare = false;
 
+    var random = Math.floor(Math.random() * 3 ) + 1;
+
     //rect or square
     if (Math.random() > 0.8) {
-      var random = Math.floor(Math.random() * 2 ) + 1;
       this.maxX = this.x + (gridSize * 3 * random);
       this.maxY = this.y + (gridSize * 2 * random);
     }
     else if (Math.random() > 0.8) {
-      var random = Math.floor(Math.random() * 5 ) + 1;
       this.maxX = this.x + (gridSize * random);
       this.maxY = this.y + (gridSize * random);
       this.bigSquare = true;
     }
     else if (Math.random() > 0.8) {
-      var random = Math.floor(Math.random() * 2 ) + 1;
       this.maxX = this.x + (gridSize * 2 * random);
       this.maxY = this.y + (gridSize * 4 * random);
       this.longRect = true;
+    }
+    else {
+      this.maxX = this.x + gridSize;
+      this.maxY = this.y + gridSize;
+      this.isSquare = true;
     }
 
     //check if out of bounds
