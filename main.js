@@ -6,7 +6,7 @@ var rectGrid = (function() {
   var rectMasks = ["link-2", "three-corner-2"];
   var colors = ["#7537f6","#acffca","#999999","#fff"];
   var gridSize = 50;
-  var shapeNo = 10;
+  var shapeNo = 20;
   var width = 1000;
   var height = 650;
   var shapeArray = [];
@@ -20,25 +20,17 @@ var rectGrid = (function() {
 
     drawCanvas();
     populateCanvas();
-    //setInterval(populateCanvas, 5000);
-    setInterval(animateRect, 2000);
+    setInterval(animateRect, 1000);
 
   };
 
   function animateRect() {
 
     _s.clear();
-    //shapeArray = [];
-
     drawCanvas();
 
-    for (var i = 0; i < shapeArray.length-1; i++) {
-      if (!checkOverlap(shapeArray[i], shapeArray[i+1]) || !checkOutOfBounds(shapeArray[i])) {
-        shapeArray[i].update();
-      }
-    }
-
     shapeArray.forEach(function(child) {
+      child.update();
       child.show();
     });
 
@@ -93,7 +85,7 @@ var rectGrid = (function() {
     this.maxX;
     this.maxY;
 
-    var smallSquare = false;
+    var square, smallSquare = false;
     var random = Math.floor(Math.random() * 2 ) + 1;
 
     //rect or square
@@ -106,6 +98,7 @@ var rectGrid = (function() {
       this.maxX = this.x + (gridSize * random);
       this.maxY = this.y + (gridSize * random);
       this.mask = assignMask(squareMasks,true);
+      square = true;
     }
     else if (Math.random() > 0.8) {
       this.maxX = this.x + (gridSize * 2 * random);
@@ -116,42 +109,50 @@ var rectGrid = (function() {
       this.maxX = this.x + gridSize;
       this.maxY = this.y + gridSize;
       this.mask = assignMask(squareMasks,true);
-      smallSquare = true;
+      square = true;
     }
 
     //check if small square and make smaller squares randomly
 
-    if (smallSquare && Math.random() > 0.2) {
+    if (square && Math.random() > 0.2) {
       this.x = (Math.floor(Math.random() * (width/(gridSize/2)))) * (gridSize/2);
       this.y = (Math.floor(Math.random() * (height/(gridSize/2)))) * (gridSize/2);
       this.maxX = this.x + (gridSize/2);
       this.maxY = this.y + (gridSize/2);
+      smallSquare = true;
     };
 
     this.update = function() {
-      // var randomZero = Math.random() < 0.5 ? gridSize : 0;
-      // if (this.maxY > height || this.maxX > width) {
-      //   this.maxY -= randomZero;
-      //   this.y -= randomZero;
-      //
-      //   this.maxX -= randomZero;
-      //   this.x -= randomZero;
-      // }
-      // else if (this.y < 0 || this.x < 0) {
-      //   this.maxY += randomZero;
-      //   this.y += randomZero;
-      //
-      //   this.maxX += randomZero;
-      //   this.x += randomZero;
-      // }
-      // else {
-        var randomSubAdd = Math.random() < 0.5 ? -gridSize : gridSize;
-        this.x += randomSubAdd;
-        this.maxX += randomSubAdd;
 
-        this.maxY += randomSubAdd;
-        this.y += randomSubAdd;
-      //}
+      var overlapping = false;
+      var randomSubAdd = Math.random() < 0.5 ? -gridSize : gridSize;
+      var projectedObj = {
+        x: this.x,
+        y: this.y,
+        maxX: this.maxX,
+        maxY: this.maxY
+      };
+
+      if (smallSquare) {
+        projectedObj.x += randomSubAdd/2;
+        projectedObj.maxX += randomSubAdd/2;
+      }
+      else {
+        projectedObj.x += randomSubAdd;
+        projectedObj.maxX += randomSubAdd;
+      }
+
+      for (var i = 0; i < shapeArray.length; i++) {
+        if (!Object.is(this,shapeArray[i]) && checkOverlap(projectedObj, shapeArray[i])) {
+          overlapping = true;
+          console.log(projectedObj,shapeArray[i]);
+        };
+      }
+
+      if (!overlapping && !checkOutOfBounds(projectedObj)) {
+        this.x = projectedObj.x;
+        this.maxX = projectedObj.maxX;
+      }
     }
 
     // if (Math.random() > 0.3) {
@@ -163,7 +164,6 @@ var rectGrid = (function() {
     // }
 
     this.show = function() {
-
       this.rect = _s.rect(this.x,this.y,this.maxX-this.x,this.maxY-this.y).attr({
         mask: _s.image("svg/" + this.mask + ".svg",this.x,this.y,this.maxX - this.x,this.maxY - this.y),
         fill: this.color });
@@ -183,7 +183,7 @@ var rectGrid = (function() {
     if (testShape.maxX > prevShape.x &&
         testShape.x < prevShape.maxX &&
         testShape.maxY > prevShape.y &&
-        testShape.y < testShape.maxY) {
+        testShape.y < prevShape.maxY) {
       return true;
     }
     return false;
