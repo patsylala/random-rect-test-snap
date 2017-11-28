@@ -37,7 +37,7 @@ var rectGrid = (function() {
     setInterval(animateRect, 500);
     setInterval(function() {
       populateCanvas();
-      if (shapeArray.length > shapeNo+10) {
+      if (shapeArray.length > shapeNo*2) {
         shapeArray.splice(Math.floor(Math.random()*shapeArray.length) + 1, 1);
       }
     }, 1000);
@@ -131,7 +131,7 @@ var rectGrid = (function() {
 
     //check if small square and make smaller squares randomly
 
-    if (this.square && Math.random() > 0.2) {
+    if (this.square && Math.random() > 0.8) {
       this.x = (Math.floor(Math.random() * (width/(gridSize/2)))) * (gridSize/2);
       this.y = (Math.floor(Math.random() * (height/(gridSize/2)))) * (gridSize/2);
       this.maxX = this.x + (gridSize/2);
