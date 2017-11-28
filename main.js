@@ -7,9 +7,9 @@ var rectGrid = (function() {
   var longRectMasks = ["link-3", "link-4"];
   var colors = ["#7537f6","#acffca","#999999","#fff"];
   var gridSize = 50;
-  var shapeNo = 10;
-  var width = 1000;
-  var height = 650;
+  var shapeNo = 20;
+  var width = 800;
+  var height = 800;
   var shapeArray = [];
 
   var start = function() {
@@ -23,10 +23,10 @@ var rectGrid = (function() {
 
     //place logo
     var logo = new Shape();
-    logo.x = (Math.floor((width/2) - (gridSize*4)/2));
-    logo.y = (Math.floor((height/2) - (gridSize*5)/2));
-    logo.maxX = logo.x + (gridSize*4);
-    logo.maxY = logo.y + (gridSize*5);
+    logo.x = (Math.floor((width/2) - (gridSize*6.5)/2));
+    logo.y = (Math.floor((height/2) - (gridSize*8.8)/2));
+    logo.maxX = logo.x + (gridSize*6.5);
+    logo.maxY = logo.y + (gridSize*8.9);
     logo.mask = "logo";
     logo.square = false;
     logo.smallSquare = false;
