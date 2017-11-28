@@ -4,9 +4,10 @@ var rectGrid = (function() {
   var squareMasks = ["three-corner","two-corner", "pyramid-corner"];
   var specialMasks = ["link"];
   var rectMasks = ["link-2", "three-corner-2"];
+  var longRectMasks = ["link-3", "link-4"];
   var colors = ["#7537f6","#acffca","#999999","#fff"];
   var gridSize = 50;
-  var shapeNo = 20;
+  var shapeNo = 15;
   var width = 1000;
   var height = 650;
   var shapeArray = [];
@@ -19,16 +20,40 @@ var rectGrid = (function() {
     });
 
     drawCanvas();
+
+    //place logo
+    var logo = new Shape();
+    logo.x = (Math.floor((width/2) - (gridSize*4)/2));
+    logo.y = (Math.floor((height/2) - (gridSize*5)/2));
+    logo.maxX = logo.x + (gridSize*4);
+    logo.maxY = logo.y + (gridSize*5);
+    logo.mask = "logo";
+    logo.square = false;
+    logo.smallSquare = false;
+    logo.color = "#fff";
+    shapeArray.push(logo);
+
     populateCanvas();
-    setInterval(animateRect, 1000);
+    setInterval(animateRect, 400);
+    setInterval(function() {
+      if (shapeArray < 10) {
+        shapeNo += 1;
+      }
+      else {
+        shapeNo += (Math.random() < 0.5 ? -1 : 1);
+      }
+      populateCanvas();
+    }, 1000);
 
   };
 
-  function animateRect() {
-
+  function clear() {
     _s.clear();
     drawCanvas();
+  };
 
+  function animateRect() {
+    clear();
     shapeArray.forEach(function(child) {
       child.update();
       child.show();
@@ -37,8 +62,8 @@ var rectGrid = (function() {
   }
 
   function populateCanvas() {
-
-    while (shapeArray.length < shapeNo) {
+    clear();
+    while (shapeArray.length <= shapeNo) {
 
       var overlapping = false;
       var newShape = new Shape();
@@ -59,73 +84,69 @@ var rectGrid = (function() {
       child.show();
     });
 
+    if (shapeArray.length > shapeNo) {
+      shapeArray.splice(Math.floor(Math.random()*shapeArray.length) + 1, 1);
+    }
+
   }
 
   function drawCanvas() {
-
-    //grid pattern from SnapSVGgrid by ajpaul, https://github.com/ajpaul/SnapSVGgrid
 
     var scaledPts = [0, 0, 0, height, width, height, width, 0, 0, 0];
     var roomOutline = _s.polyline(scaledPts).attr({ stroke: '#fff', fill: 'transparent', strokeWidth: 1 });
     var p_line1 = _s.paper.line(0, 0, gridSize, 0).attr({ stroke: '#fff' });
     var p_line2 = _s.paper.line(0, 0, 0, gridSize).attr({ stroke: '#fff' });
     var pattern = _s.paper.g(p_line1, p_line2).pattern(0, 0, gridSize, gridSize);
-
-    //apply pattern
     roomOutline.attr({ fill: pattern });
 
   }
 
   function Shape() {
-    this.rect;
-    this.mask;
+
+    this.smallSquare,this.square,this.rect,this.mask,this.maxX,this.maxY;
     this.color = colors[randomNumber(colors)];
     this.x = (Math.floor(Math.random() * (width/gridSize))) * gridSize;
     this.y = (Math.floor(Math.random() * (height/gridSize))) * gridSize;
-    this.maxX;
-    this.maxY;
 
-    var square, smallSquare = false;
     var random = Math.floor(Math.random() * 2 ) + 1;
 
-    //rect or square
-    if (Math.random() > 0.8) {
+    //make random rect or square
+
+    if (Math.random() > 0.5) {
       this.maxX = this.x + (gridSize * 3 * random);
       this.maxY = this.y + (gridSize * 2 * random);
       this.mask = assignMask(rectMasks,false);
     }
-    else if (Math.random() > 0.8) {
+    else if (Math.random() > 0.5) {
       this.maxX = this.x + (gridSize * random);
       this.maxY = this.y + (gridSize * random);
       this.mask = assignMask(squareMasks,true);
-      square = true;
+      this.square = true;
     }
-    else if (Math.random() > 0.8) {
-      this.maxX = this.x + (gridSize * 2 * random);
-      this.maxY = this.y + (gridSize * 4 * random);
-      this.mask = "link-3"
+    else if (Math.random() > 0.5) {
+      this.maxX = this.x + (gridSize * 2);
+      this.maxY = this.y + (gridSize * 4);
+      this.mask = assignMask(longRectMasks,false);
     }
     else {
       this.maxX = this.x + gridSize;
       this.maxY = this.y + gridSize;
       this.mask = assignMask(squareMasks,true);
-      square = true;
+      this.square = true;
     }
 
     //check if small square and make smaller squares randomly
 
-    if (square && Math.random() > 0.2) {
+    if (this.square && Math.random() > 0.2) {
       this.x = (Math.floor(Math.random() * (width/(gridSize/2)))) * (gridSize/2);
       this.y = (Math.floor(Math.random() * (height/(gridSize/2)))) * (gridSize/2);
       this.maxX = this.x + (gridSize/2);
       this.maxY = this.y + (gridSize/2);
-      smallSquare = true;
+      this.smallSquare = true;
     };
 
     this.update = function() {
 
-      var overlapping = false;
-      var randomSubAdd = Math.random() < 0.5 ? -gridSize : gridSize;
       var projectedObj = {
         x: this.x,
         y: this.y,
@@ -133,50 +154,70 @@ var rectGrid = (function() {
         maxY: this.maxY
       };
 
-      if (smallSquare) {
-        projectedObj.x += randomSubAdd/2;
-        projectedObj.maxX += randomSubAdd/2;
+      var gridMove = this.smallSquare ? gridSize/2 : gridSize;
+      var randomSubAdd = Math.random() < 0.5 ? -gridMove : gridMove;
+      var overlapping = false;
+
+      if (Math.random() > 0.5) {
+        //if square, change size
+        if (this.square && (projectedObj.maxX - projectedObj.x > gridSize || projectedObj.maxY - projectedObj.y > gridSize)) {
+          projectedObj.maxX += randomSubAdd;
+          projectedObj.maxY += randomSubAdd;
+        }
+        else if (this.square && (projectedObj.maxX - projectedObj.x == gridSize || projectedObj.maxY - projectedObj.y == gridSize)) {
+          projectedObj.maxX += gridSize;
+          projectedObj.maxY += gridSize;
+        }
       }
       else {
-        projectedObj.x += randomSubAdd;
-        projectedObj.maxX += randomSubAdd;
+        //else, move it around
+        if (Math.random() > 0.5) {
+          projectedObj.x += randomSubAdd;
+          projectedObj.maxX += randomSubAdd;
+        }
+        else if (Math.random() > 0.5) {
+          projectedObj.y += randomSubAdd;
+          projectedObj.maxY += randomSubAdd;
+        }
       }
 
       for (var i = 0; i < shapeArray.length; i++) {
         if (!Object.is(this,shapeArray[i]) && checkOverlap(projectedObj, shapeArray[i])) {
           overlapping = true;
-          console.log(projectedObj,shapeArray[i]);
         };
       }
 
       if (!overlapping && !checkOutOfBounds(projectedObj)) {
         this.x = projectedObj.x;
         this.maxX = projectedObj.maxX;
+        this.y = projectedObj.y;
+        this.maxY = projectedObj.maxY;
       }
-    }
 
-    // if (Math.random() > 0.3) {
-    //   if (this.isSquare) {this.rect.transform("r" + (Math.floor(Math.random()* 4) * 90).toString())}
-    //   else {this.rect.transform('s1,' + (Math.random() < 0.5 ? -1 : 1).toString())};
-    // }
-    // if (Math.random() > 0.3) {
-    //   this.rect.attr({ fill: colors[randomNumber(colors)] });
-    // }
+    }
 
     this.show = function() {
       this.rect = _s.rect(this.x,this.y,this.maxX-this.x,this.maxY-this.y).attr({
         mask: _s.image("svg/" + this.mask + ".svg",this.x,this.y,this.maxX - this.x,this.maxY - this.y),
         fill: this.color });
+      if (!this.square && !(this.mask == "logo") && Math.random() > 0.5) {
+        this.rect.transform('s' + (Math.random() < 0.5 ? -1 : 1).toString() + ",1")
+      }
     };
-  }
 
-  function assignMask(maskArray,isSquare) {
-    var mask = maskArray[randomNumber(maskArray)];
-    if (isSquare) {
-      var masks = maskArray.concat(specialMasks);
-      mask = maskArray[randomNumber(maskArray)];
+    function assignMask(maskArray,isSquare) {
+      var mask = maskArray[randomNumber(maskArray)];
+      if (isSquare) {
+        var masks = maskArray.concat(specialMasks);
+        mask = maskArray[randomNumber(maskArray)];
+      }
+      return mask;
     }
-    return mask;
+
+    function randomNumber(arr) {
+      return (Math.floor(Math.random()*arr.length));
+    };
+
   }
 
   function checkOverlap(testShape, prevShape) {
@@ -196,14 +237,6 @@ var rectGrid = (function() {
     }
     return false;
   }
-
-  function valBetween(v, min, max) {
-    return (Math.min(max, Math.max(min, v)));
-  };
-
-  function randomNumber(arr) {
-    return (Math.floor(Math.random()*arr.length));
-  };
 
   return {
       start: start
