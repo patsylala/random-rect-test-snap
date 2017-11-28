@@ -52,10 +52,12 @@ var rectGrid = (function() {
 
   function animateRect() {
     clear();
-    shapeArray.forEach(function(child) {
-      child.update();
-      child.show();
-    });
+    for(var i = 0; i < shapeArray.length; i++) {
+      if (!(i == 0)) {
+        shapeArray[i].update();
+      }
+      shapeArray[i].show();
+    };
 
   }
 
@@ -132,7 +134,7 @@ var rectGrid = (function() {
 
     //check if small square and make smaller squares randomly
 
-    if (this.square && Math.random() > 0.8) {
+    if (this.square && Math.random() > 0.5) {
       this.x = (Math.floor(Math.random() * (width/(gridSize/2)))) * (gridSize/2);
       this.y = (Math.floor(Math.random() * (height/(gridSize/2)))) * (gridSize/2);
       this.maxX = this.x + (gridSize/2);
