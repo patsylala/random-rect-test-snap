@@ -7,7 +7,7 @@ var rectGrid = (function() {
   var longRectMasks = ["link-3", "link-4"];
   var colors = ["#7537f6","#acffca","#999999","#fff"];
   var gridSize = 50;
-  var shapeNo = 15;
+  var shapeNo = 10;
   var width = 1000;
   var height = 650;
   var shapeArray = [];
@@ -36,12 +36,6 @@ var rectGrid = (function() {
     populateCanvas();
     setInterval(animateRect, 400);
     setInterval(function() {
-      if (shapeArray < 10) {
-        shapeNo += 1;
-      }
-      else {
-        shapeNo += (Math.random() < 0.5 ? -1 : 1);
-      }
       populateCanvas();
     }, 1000);
 
@@ -63,21 +57,25 @@ var rectGrid = (function() {
 
   function populateCanvas() {
     clear();
-    while (shapeArray.length <= shapeNo) {
 
+    if (shapeArray < 10) {
+      shapeNo += 1;
+    }
+    else {
+      shapeNo += (Math.random() < 0.5 ? -1 : 1);
+    }
+
+    while (shapeArray.length <= shapeNo) {
       var overlapping = false;
       var newShape = new Shape();
-
       for (var i = 0; i < shapeArray.length; i++) {
         if (checkOverlap(newShape, shapeArray[i])) {
           overlapping = true;
         }
       }
-
       if (!overlapping && !checkOutOfBounds(newShape)) {
         shapeArray.push(newShape);
       }
-
     }
 
     shapeArray.forEach(function(child) {
@@ -91,18 +89,15 @@ var rectGrid = (function() {
   }
 
   function drawCanvas() {
-
     var scaledPts = [0, 0, 0, height, width, height, width, 0, 0, 0];
     var roomOutline = _s.polyline(scaledPts).attr({ stroke: '#fff', fill: 'transparent', strokeWidth: 1 });
     var p_line1 = _s.paper.line(0, 0, gridSize, 0).attr({ stroke: '#fff' });
     var p_line2 = _s.paper.line(0, 0, 0, gridSize).attr({ stroke: '#fff' });
     var pattern = _s.paper.g(p_line1, p_line2).pattern(0, 0, gridSize, gridSize);
     roomOutline.attr({ fill: pattern });
-
   }
 
   function Shape() {
-
     this.smallSquare,this.square,this.rect,this.mask,this.maxX,this.maxY;
     this.color = colors[randomNumber(colors)];
     this.x = (Math.floor(Math.random() * (width/gridSize))) * gridSize;
@@ -158,7 +153,7 @@ var rectGrid = (function() {
       var randomSubAdd = Math.random() < 0.5 ? -gridMove : gridMove;
       var overlapping = false;
 
-      if (Math.random() > 0.5) {
+      if (!this.smallSquare && Math.random() > 0.5) {
         //if square, change size
         if (this.square && (projectedObj.maxX - projectedObj.x > gridSize || projectedObj.maxY - projectedObj.y > gridSize)) {
           projectedObj.maxX += randomSubAdd;
@@ -168,6 +163,7 @@ var rectGrid = (function() {
           projectedObj.maxX += gridSize;
           projectedObj.maxY += gridSize;
         }
+
       }
       else {
         //else, move it around
@@ -180,7 +176,6 @@ var rectGrid = (function() {
           projectedObj.maxY += randomSubAdd;
         }
       }
-
       for (var i = 0; i < shapeArray.length; i++) {
         if (!Object.is(this,shapeArray[i]) && checkOverlap(projectedObj, shapeArray[i])) {
           overlapping = true;
@@ -200,7 +195,7 @@ var rectGrid = (function() {
       this.rect = _s.rect(this.x,this.y,this.maxX-this.x,this.maxY-this.y).attr({
         mask: _s.image("svg/" + this.mask + ".svg",this.x,this.y,this.maxX - this.x,this.maxY - this.y),
         fill: this.color });
-      if (!this.square && !(this.mask == "logo") && Math.random() > 0.5) {
+      if (!this.square && !(this.mask == "logo")) {
         this.rect.transform('s' + (Math.random() < 0.5 ? -1 : 1).toString() + ",1")
       }
     };
