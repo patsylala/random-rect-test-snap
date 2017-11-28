@@ -37,9 +37,10 @@ var rectGrid = (function() {
     setInterval(animateRect, 500);
     setInterval(function() {
       populateCanvas();
-      if (shapeArray.length > shapeNo*2) {
+      if (shapeArray.length > shapeNo) {
         shapeArray.splice(Math.floor(Math.random()*shapeArray.length) + 1, 1);
       }
+      console.log(shapeArray.length);
     }, 1000);
 
   };
@@ -61,7 +62,7 @@ var rectGrid = (function() {
   function populateCanvas() {
     clear();
 
-    if (shapeArray <= shapeNo) {
+    if (shapeArray.length <= shapeNo) {
       shapeNo += 1;
     }
     else {
@@ -80,6 +81,10 @@ var rectGrid = (function() {
         shapeArray.push(newShape);
       }
     }
+
+    shapeArray.forEach(function(child) {
+      child.show();
+    });
 
   }
 
