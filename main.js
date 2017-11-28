@@ -34,9 +34,12 @@ var rectGrid = (function() {
     shapeArray.push(logo);
 
     populateCanvas();
-    setInterval(animateRect, 400);
+    setInterval(animateRect, 500);
     setInterval(function() {
       populateCanvas();
+      if (shapeArray.length > shapeNo) {
+        shapeArray.splice(Math.floor(Math.random()*shapeArray.length) + 1, 1);
+      }
     }, 1000);
 
   };
@@ -58,14 +61,14 @@ var rectGrid = (function() {
   function populateCanvas() {
     clear();
 
-    if (shapeArray < 10) {
+    if (shapeArray <= shapeNo) {
       shapeNo += 1;
     }
     else {
       shapeNo += (Math.random() < 0.5 ? -1 : 1);
     }
 
-    while (shapeArray.length <= shapeNo) {
+    while (shapeArray.length <= shapeNo+1) {
       var overlapping = false;
       var newShape = new Shape();
       for (var i = 0; i < shapeArray.length; i++) {
@@ -81,10 +84,6 @@ var rectGrid = (function() {
     shapeArray.forEach(function(child) {
       child.show();
     });
-
-    if (shapeArray.length > shapeNo) {
-      shapeArray.splice(Math.floor(Math.random()*shapeArray.length) + 1, 1);
-    }
 
   }
 
@@ -199,21 +198,20 @@ var rectGrid = (function() {
         this.rect.transform('s' + (Math.random() < 0.5 ? -1 : 1).toString() + ",1")
       }
     };
-
-    function assignMask(maskArray,isSquare) {
-      var mask = maskArray[randomNumber(maskArray)];
-      if (isSquare) {
-        var masks = maskArray.concat(specialMasks);
-        mask = maskArray[randomNumber(maskArray)];
-      }
-      return mask;
-    }
-
-    function randomNumber(arr) {
-      return (Math.floor(Math.random()*arr.length));
-    };
-
   }
+
+  function assignMask(maskArray,isSquare) {
+    var mask = maskArray[randomNumber(maskArray)];
+    if (isSquare) {
+      var masks = maskArray.concat(specialMasks);
+      mask = maskArray[randomNumber(maskArray)];
+    }
+    return mask;
+  }
+
+  function randomNumber(arr) {
+    return (Math.floor(Math.random()*arr.length));
+  };
 
   function checkOverlap(testShape, prevShape) {
     if (testShape.maxX > prevShape.x &&
