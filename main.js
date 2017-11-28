@@ -37,7 +37,7 @@ var rectGrid = (function() {
     setInterval(animateRect, 500);
     setInterval(function() {
       populateCanvas();
-      if (shapeArray.length > shapeNo) {
+      if (shapeArray.length > shapeNo+10) {
         shapeArray.splice(Math.floor(Math.random()*shapeArray.length) + 1, 1);
       }
     }, 1000);
