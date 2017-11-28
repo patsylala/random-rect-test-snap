@@ -81,10 +81,6 @@ var rectGrid = (function() {
       }
     }
 
-    shapeArray.forEach(function(child) {
-      child.show();
-    });
-
   }
 
   function drawCanvas() {
